@@ -36,7 +36,7 @@ HTML_FORM = '''
 </form>
 {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
 {% if recommendations is not none %}
-  <h2>Recommended Movies:</h2>
+  <h2>Recommended Movies{% if typed_title %} for "{{ typed_title }}"{% endif %}:</h2>
   <ul>
   {% for _, row in recommendations.iterrows() %}
     <li><b>{{ row['title'] }}</b> ({{ row['genre'] }}, Rating: {{ row['rating'] }})<br>{{ row['description'] }}</li>
@@ -49,12 +49,14 @@ HTML_FORM = '''
 def index():
     recommendations = None
     error = None
+    typed_title = None
     if request.method == 'POST':
         title = request.form['title'].strip()
+        typed_title = title
         recs, error = get_recommendations(title)
         if recs is not None:
             recommendations = recs
-    return render_template_string(HTML_FORM, recommendations=recommendations, error=error)
+    return render_template_string(HTML_FORM, recommendations=recommendations, error=error, typed_title=typed_title)
 
 if __name__ == '__main__':
     app.run(debug=True) 
