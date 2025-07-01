@@ -35,7 +35,7 @@ HTML_FORM = '''
   <input type="submit" value="Recommend">
 </form>
 {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
-{% if recommendations %}
+{% if recommendations is not none %}
   <h2>Recommended Movies:</h2>
   <ul>
   {% for _, row in recommendations.iterrows() %}
