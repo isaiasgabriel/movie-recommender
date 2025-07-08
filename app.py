@@ -18,12 +18,30 @@ df_movies = pd.read_csv(df_movies_filename)
 def get_recommendations(title: str):
     if title not in loaded_indices:
         return None, f"Error: Movie '{title}' not found in the dataset."
+    
     idx = loaded_indices[title]
+    
+    # Get the genres of the input movie
+    input_movie_genres = set(df_movies.iloc[idx]['genre'].split(', '))
+    
     movie_vector = loaded_tfidf_matrix[idx]
     distances, movie_indices = loaded_nn_model.kneighbors(movie_vector)
     similar_movie_indices = movie_indices.flatten()[1:]
-    recommended_movies = df_movies.iloc[similar_movie_indices]
-    return recommended_movies[['title', 'genre', 'description']], None
+    
+    recommended_movies = df_movies.iloc[similar_movie_indices].copy()
+    
+    # --- START: Added Common Genre Calculation ---
+    def get_common_genres(genre_str):
+        if not isinstance(genre_str, str):
+            return ""
+        recommended_genres = set(genre_str.split(', '))
+        common = input_movie_genres.intersection(recommended_genres)
+        return ', '.join(common)
+
+    recommended_movies['common_genres'] = recommended_movies['genre'].apply(get_common_genres)
+    # --- END: Added Common Genre Calculation ---
+
+    return recommended_movies[['title', 'genre', 'description', 'common_genres']], None
 
 HTML_FORM = '''
 <!doctype html>
@@ -130,6 +148,7 @@ HTML_FORM = '''
         <li class="recommendation-item">
           <h3>{{ row['title'] }}</h3>
           <p class="meta"><b>Genre:</b> {{ row['genre'] }}</p>
+          <p class="meta"><b>Common Genres:</b> <span style="font-weight: bold; color: #5a67d8;">{{ row['common_genres'] }}</span></p>
           <p>{{ row['description'] }}</p>
         </li>
       {% endfor %}
