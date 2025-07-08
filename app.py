@@ -5,10 +5,10 @@ import pandas as pd
 app = Flask(__name__)
 
 # Load models and data
-model_filename = 'knn_model.joblib'
-tfidf_matrix_filename = 'tfidf_matrix.joblib'
-indices_filename = 'indices.joblib'
-df_movies_filename = 'df_movies.csv'
+model_filename = 'models/knn_model.joblib'
+tfidf_matrix_filename = 'models/tfidf_matrix.joblib'
+indices_filename = 'models/indices.joblib'
+df_movies_filename = 'data/df_movies.csv'
 
 loaded_nn_model = joblib.load(model_filename)
 loaded_tfidf_matrix = joblib.load(tfidf_matrix_filename)
